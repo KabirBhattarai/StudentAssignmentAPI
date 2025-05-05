@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StudentAssignmentAPI.Constrains.Request;
 using StudentAssignmentAPI.Data;
 using StudentAssignmentAPI.Entities;
@@ -9,7 +10,9 @@ using StudentAssignmentAPI.Services.Interfaces;
 namespace StudentAssignmentAPI.Controllers;
 
 [Route("api/students")]
+[Authorize]
 [ApiController]
+[Authorize]
 public class StudentController : ControllerBase
 {
     private readonly IStudentRepository _studentRepository;

@@ -16,6 +16,11 @@ public class AssignmentService : IAssignmentService
 
     public async Task<Assignment> AddAssignmentAsync(AssignmentRequestDto dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Title))
+        {
+            throw new Exception("Title is required");
+        }
+        
         var assignment = new Assignment
         {
             Title = dto.Title,
@@ -31,6 +36,11 @@ public class AssignmentService : IAssignmentService
 
     public async Task<Assignment> UpdateAssignmentAsync(Guid id, AssignmentRequestDto dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Title))
+        {
+            throw new Exception("Title is required");
+        }
+        
         var assignment = await _context.Assignments.FindAsync(id);
         if (assignment == null)
         {
@@ -40,6 +50,7 @@ public class AssignmentService : IAssignmentService
         assignment.Description = dto.Description;
         assignment.DueDate = dto.DueDate;
         assignment.StudentId = dto.StudentId;
+        
         await _context.SaveChangesAsync();
         return assignment;
     }
