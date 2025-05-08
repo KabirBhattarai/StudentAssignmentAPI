@@ -11,9 +11,9 @@ using StudentAssignmentAPI.Services.Interfaces;
 namespace StudentAssignmentAPI.Controllers;
 
 [Route("api/assignments")]
-[Authorize]
+
 [ApiController]
-[Authorize]
+
 public class AssignmentController : ControllerBase
 {
     private readonly ApplicationDbContext _context;

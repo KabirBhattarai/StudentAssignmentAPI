@@ -27,7 +27,8 @@ public class AssignmentRepository : GenericRepo<Assignment>, IAssignmentReposito
                 Title = a.Title,
                 Description = a.Description,
                 DueDate = a.DueDate,
-                StudentId = a.StudentId
+                StudentId = a.StudentId,
+                IsSubmitted = a.IsSubmitted
             })
             .ToListAsync();
         return assignments;
@@ -43,7 +44,8 @@ public class AssignmentRepository : GenericRepo<Assignment>, IAssignmentReposito
                 Title = a.Title,
                 Description = a.Description,
                 DueDate = a.DueDate,
-                StudentId = a.StudentId
+                StudentId = a.StudentId,
+                IsSubmitted = a.IsSubmitted
             })
             .FirstOrDefaultAsync();
         if (assignment == null)

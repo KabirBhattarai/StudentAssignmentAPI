@@ -27,7 +27,8 @@ public class AssignmentService : IAssignmentService
             Title = dto.Title,
             Description = dto.Description,
             DueDate = dto.DueDate,
-            StudentId = dto.StudentId
+            StudentId = dto.StudentId,
+            IsSubmitted = dto.IsSubmitted
 
         };
         
@@ -53,6 +54,7 @@ public class AssignmentService : IAssignmentService
         assignment.Description = dto.Description;
         assignment.DueDate = dto.DueDate;
         assignment.StudentId = dto.StudentId;
+        assignment.IsSubmitted = dto.IsSubmitted;
         
         //await _context.SaveChangesAsync();
         await _assignmentRepository.UpdateAsync(assignment);
