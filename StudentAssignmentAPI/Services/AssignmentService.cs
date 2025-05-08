@@ -1,17 +1,18 @@
 ﻿using StudentAssignmentAPI.Constrains.Request;
 using StudentAssignmentAPI.Data;
 using StudentAssignmentAPI.Entities;
+using StudentAssignmentAPI.Repositories.Interfaces;
 using StudentAssignmentAPI.Services.Interfaces;
 
 namespace StudentAssignmentAPI.Services;
 
 public class AssignmentService : IAssignmentService
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IAssignmentRepository _assignmentRepository;
 
-    public AssignmentService(ApplicationDbContext context)
+    public AssignmentService(IAssignmentRepository assignmentRepository)
     {
-        _context = context;
+        _assignmentRepository = assignmentRepository;
     }
 
     public async Task<Assignment> AddAssignmentAsync(AssignmentRequestDto dto)
@@ -29,8 +30,8 @@ public class AssignmentService : IAssignmentService
             StudentId = dto.StudentId
 
         };
-        await _context.Assignments.AddAsync(assignment);
-        await _context.SaveChangesAsync();
+        
+        await _assignmentRepository.AddAsync(assignment);
         return assignment;
     }
 
@@ -41,7 +42,9 @@ public class AssignmentService : IAssignmentService
             throw new Exception("Title is required");
         }
         
-        var assignment = await _context.Assignments.FindAsync(id);
+        //var assignment = await _context.Assignments.FindAsync(id);
+        var assignment = await _assignmentRepository.GetByIdAsync(id);
+        
         if (assignment == null)
         {
             throw new Exception("Assignment not found");
@@ -51,18 +54,14 @@ public class AssignmentService : IAssignmentService
         assignment.DueDate = dto.DueDate;
         assignment.StudentId = dto.StudentId;
         
-        await _context.SaveChangesAsync();
+        //await _context.SaveChangesAsync();
+        await _assignmentRepository.UpdateAsync(assignment);
         return assignment;
     }
 
+    // To make it extensible
     public async Task DeleteAssignmentAsync(Guid id)
     {
-        var assignment = await _context.Assignments.FindAsync(id);
-        if (assignment == null)
-        {
-            throw new Exception("Assignment not found");
-        }
-        _context.Assignments.Remove(assignment);
-        await _context.SaveChangesAsync();
+        await _assignmentRepository.DeleteAsync(id);
     }
 }

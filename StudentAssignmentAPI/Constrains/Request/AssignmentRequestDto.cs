@@ -8,3 +8,4 @@ public class AssignmentRequestDto
     public bool IsSubmitted { get; set; }
     public Guid StudentId { get; set; }
 }
+
