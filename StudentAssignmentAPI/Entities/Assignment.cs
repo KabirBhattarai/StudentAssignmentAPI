@@ -1,4 +1,6 @@
-﻿namespace StudentAssignmentAPI.Entities;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+
+namespace StudentAssignmentAPI.Entities;
 
 public class Assignment
 {

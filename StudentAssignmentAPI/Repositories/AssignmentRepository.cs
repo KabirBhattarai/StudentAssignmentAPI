@@ -1,15 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StudentAssignmentAPI.Constrains.Response;
 using StudentAssignmentAPI.Data;
+using StudentAssignmentAPI.Entities;
+using StudentAssignmentAPI.GenericRepo;
 using StudentAssignmentAPI.Repositories.Interfaces;
 
 namespace StudentAssignmentAPI.Repositories;
 
-public class AssignmentRepository : IAssignmentRepository
+
+// Assignment repo is inheriting from the generic repo
+public class AssignmentRepository : GenericRepo<Assignment>, IAssignmentRepository
 {
     private readonly ApplicationDbContext _context;
 
-    public AssignmentRepository(ApplicationDbContext context)
+    public AssignmentRepository(ApplicationDbContext context) : base(context)
     {
         _context = context;
     }
@@ -48,6 +52,7 @@ public class AssignmentRepository : IAssignmentRepository
         {
             throw new Exception("Assignment not found");
         }
+
         return assignment;
     }
 }

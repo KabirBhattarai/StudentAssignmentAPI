@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StudentAssignmentAPI.Constrains.Request;
 using StudentAssignmentAPI.Data;
@@ -17,12 +19,17 @@ public class AssignmentController : ControllerBase
     private readonly ApplicationDbContext _context;
     private readonly IAssignmentService _assignmentService;
     private readonly IAssignmentRepository _assignmentRepository;
+    
+    private readonly ILogger<AssignmentController> _logger;
 
-    public AssignmentController(ApplicationDbContext context, IAssignmentService assignmentService, IAssignmentRepository assignmentRepository)
+
+    public AssignmentController(ApplicationDbContext context, IAssignmentService assignmentService,
+        IAssignmentRepository assignmentRepository, ILogger<AssignmentController> logger)
     {
         _context = context;
         _assignmentService = assignmentService;
         _assignmentRepository = assignmentRepository;
+        _logger = logger;
     }
 
 
@@ -31,12 +38,17 @@ public class AssignmentController : ControllerBase
     {
         try
         {
+            _logger.LogInformation("Creating assignment");
+            
             var assignment = await _assignmentService.AddAssignmentAsync(dto);
+            
+            _logger.LogInformation("Assignment created successfully {assignmentId}", assignment.Id);
+            
             return Ok(new { message = "Assignment created successfully" });
-
         }
         catch (Exception e)
         {
+            _logger.LogError(e, "Error while creating assignment");
             return BadRequest(e.Message);
         }
     }
@@ -48,7 +60,6 @@ public class AssignmentController : ControllerBase
         {
             var assignment = await _assignmentService.UpdateAssignmentAsync(id, dto);
             return Ok(new { message = "Assignment updated successfully" });
-
         }
         catch (Exception e)
         {
@@ -63,7 +74,6 @@ public class AssignmentController : ControllerBase
         {
             await _assignmentService.DeleteAssignmentAsync(id);
             return Ok(new { message = "Assignment deleted successfully" });
-
         }
         catch (Exception e)
         {
@@ -78,7 +88,6 @@ public class AssignmentController : ControllerBase
         {
             var assignments = await _assignmentRepository.GetAllAssignmentsAsync();
             return Ok(new { message = "Assignment retrieved successfully", assignments = assignments });
-
         }
         catch (Exception e)
         {
@@ -93,7 +102,6 @@ public class AssignmentController : ControllerBase
         {
             var assignment = await _assignmentRepository.GetAssignmentByIdAsync(id);
             return Ok(new { message = "Assignment retrieved successfully" });
-
         }
         catch (Exception e)
         {
