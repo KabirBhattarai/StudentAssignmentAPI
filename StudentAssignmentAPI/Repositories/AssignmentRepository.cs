@@ -23,7 +23,8 @@ public class AssignmentRepository : IAssignmentRepository
                 Title = a.Title,
                 Description = a.Description,
                 DueDate = a.DueDate,
-                StudentId = a.StudentId
+                StudentId = a.StudentId,
+                IsSubmitted = a.IsSubmitted
             })
             .ToListAsync();
         return assignments;
@@ -39,7 +40,8 @@ public class AssignmentRepository : IAssignmentRepository
                 Title = a.Title,
                 Description = a.Description,
                 DueDate = a.DueDate,
-                StudentId = a.StudentId
+                StudentId = a.StudentId,
+                IsSubmitted = a.IsSubmitted
             })
             .FirstOrDefaultAsync();
         if (assignment == null)

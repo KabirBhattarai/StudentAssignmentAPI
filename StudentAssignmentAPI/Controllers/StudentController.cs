@@ -10,9 +10,8 @@ using StudentAssignmentAPI.Services.Interfaces;
 namespace StudentAssignmentAPI.Controllers;
 
 [Route("api/students")]
-[Authorize]
+
 [ApiController]
-[Authorize]
 public class StudentController : ControllerBase
 {
     private readonly IStudentRepository _studentRepository;

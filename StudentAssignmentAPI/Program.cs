@@ -1,3 +1,5 @@
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StudentAssignmentAPI.Data;
@@ -18,14 +20,24 @@ builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<IBulkJobService, BulkJobService>();
+
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(b =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     b.UseNpgsql(connectionString);
 });
+
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UsePostgreSqlStorage(connectionString));
+
+builder.Services.AddHangfireServer();
 
 var app = builder.Build();
 
@@ -35,6 +47,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseHangfireDashboard();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
