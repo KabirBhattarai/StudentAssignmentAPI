@@ -8,27 +8,58 @@ namespace StudentAssignmentAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+public class BulkController : ControllerBase
+{
+    private readonly IBulkJobService _bulkJobService;
 
-    public class BulkController : ControllerBase
+    public BulkController(IBulkJobService bulkJobService)
     {
-        private readonly IBulkJobService _bulkJobService;
+        _bulkJobService = bulkJobService;
+    }
 
-        public BulkController(IBulkJobService bulkJobService)
+    [HttpPost("import-students")]
+    public IActionResult ImportStudents([FromBody] BulkStudentDto dto)
+    {
+        var jobId = BackgroundJob.Enqueue<IBulkJobService>(x => x.ImportStudentsAsync(dto.Students));
+
+        // OK = completed. It will respond 200. ❌
+        // Working on it = 202. It will respond 202. ✅
+
+        return Accepted(new
         {
-            _bulkJobService = bulkJobService;
+            JobId = jobId,
+            Status = "Queued"
+        });
+    }
+
+    public IActionResult Check(string jobId)
+    {
+        try
+        {
+            var jobState = JobStorage.Current.GetMonitoringApi().JobDetails(jobId);
+            if (jobState == null)
+            {
+                return NotFound(new { Message = "Job not found" });
+            }
+
+            // states are "Enqueued", "Processing", "Succeeded", "Failed", etc.
+            var state = jobState.History.FirstOrDefault()?.StateName;
+            return Ok(new
+            {
+                JobId = jobId,
+                Status = state
+            });
         }
-
-        [HttpPost("import-students")]
-        public IActionResult ImportStudents([FromBody] BulkStudentDto dto)
+        catch (Exception e)
         {
-            var jobId = BackgroundJob.Enqueue(() => _bulkJobService.ImportStudentsAsync(dto.Students));
-            return Ok(new { JobId = jobId, Status = "Queued" });
-        }
-
-        [HttpPost("import-assignments")]
-        public IActionResult ImportAssignments([FromBody] BulkAssignmentDto dto)
-        {
-            var jobId = BackgroundJob.Enqueue(() => _bulkJobService.ImportAssignmentsAsync(dto.Assignments));
-            return Ok(new { JobId = jobId, Status = "Queued" });
+            return BadRequest(new { Message = "Error retrieving job status", Error = e.Message });
         }
     }
+
+    [HttpPost("import-assignments")]
+    public IActionResult ImportAssignments([FromBody] BulkAssignmentDto dto)
+    {
+        var jobId = BackgroundJob.Enqueue(() => _bulkJobService.ImportAssignmentsAsync(dto.Assignments));
+        return Ok(new { JobId = jobId, Status = "Queued" });
+    }
+}
