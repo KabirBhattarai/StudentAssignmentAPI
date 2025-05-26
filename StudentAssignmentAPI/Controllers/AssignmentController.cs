@@ -19,7 +19,6 @@ public class AssignmentController : ControllerBase
     private readonly ApplicationDbContext _context;
     private readonly IAssignmentService _assignmentService;
     private readonly IAssignmentRepository _assignmentRepository;
-    
     private readonly ILogger<AssignmentController> _logger;
 
 
@@ -34,7 +33,7 @@ public class AssignmentController : ControllerBase
 
 
     [HttpPost]
-    public async Task<IActionResult> CreateAssignment([FromBody] AssignmentRequestDto dto)
+    public async Task<IActionResult> Create([FromBody] AssignmentRequestDto dto)
     {
         try
         {
@@ -44,7 +43,7 @@ public class AssignmentController : ControllerBase
             
             _logger.LogInformation("Assignment created successfully {assignmentId}", assignment.Id);
             
-            return Ok(new { message = "Assignment created successfully" });
+            return Ok(new { message = "Assignment created successfully", data = assignment });
         }
         catch (Exception e)
         {
@@ -54,57 +53,65 @@ public class AssignmentController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAssignment(Guid id, [FromBody] AssignmentRequestDto dto)
+    public async Task<IActionResult> Update(Guid id, [FromBody] AssignmentRequestDto dto)
     {
         try
         {
+            _logger.LogInformation("Updating assignment");
             var assignment = await _assignmentService.UpdateAssignmentAsync(id, dto);
-            return Ok(new { message = "Assignment updated successfully" });
+            return Ok(new { message = "Assignment updated successfully", data = assignment });
         }
         catch (Exception e)
         {
+            _logger.LogError(e, "Error while updating assignment");
             return BadRequest(e.Message);
         }
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAssignment(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
         try
         {
+            _logger.LogInformation("Deleting assignment");
             await _assignmentService.DeleteAssignmentAsync(id);
             return Ok(new { message = "Assignment deleted successfully" });
         }
         catch (Exception e)
         {
+            _logger.LogError(e, "Error while deleting assignment");
             return BadRequest(e.Message);
         }
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllAssignments()
+    public async Task<IActionResult> GetAll()
     {
         try
         {
+            _logger.LogInformation("Getting assignments");
             var assignments = await _assignmentRepository.GetAllAssignmentsAsync();
-            return Ok(new { message = "Assignment retrieved successfully", assignments = assignments });
+            return Ok(new { message = "Assignment retrieved successfully", data = assignments });
         }
         catch (Exception e)
         {
+            _logger.LogError(e, "Error while getting assignments");
             return BadRequest(e.Message);
         }
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetAssignmentById(Guid id)
+    public async Task<IActionResult> GetById(Guid id)
     {
         try
         {
+            _logger.LogInformation("Getting the assignment");
             var assignment = await _assignmentRepository.GetAssignmentByIdAsync(id);
-            return Ok(new { message = "Assignment retrieved successfully" });
+            return Ok(new { message = "Assignment retrieved successfully", data = assignment });
         }
         catch (Exception e)
         {
+            _logger.LogError(e, "Error while getting the assignment");
             return BadRequest(e.Message);
         }
     }

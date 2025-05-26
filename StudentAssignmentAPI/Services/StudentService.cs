@@ -1,17 +1,17 @@
 ﻿using StudentAssignmentAPI.Constrains.Request;
-using StudentAssignmentAPI.Data;
 using StudentAssignmentAPI.Entities;
+using StudentAssignmentAPI.Repositories.Interfaces;
 using StudentAssignmentAPI.Services.Interfaces;
 
 namespace StudentAssignmentAPI.Services;
 
 public class StudentService : IStudentService
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IStudentRepository _studentRepository;
 
-    public StudentService(ApplicationDbContext context)
+    public StudentService(IStudentRepository studentRepository)
     {
-        _context = context;
+        _studentRepository = studentRepository;
     }
 
     public async Task<Student> AddStudentAsync(StudentRequestDto dto)
@@ -20,15 +20,14 @@ public class StudentService : IStudentService
         {
             throw new Exception("Full Name is required");
         }
-        
+
         var student = new Student
         {
             FullName = dto.FullName,
             Email = dto.Email
         };
-        
-        _context.Students.Add(student);
-        await _context.SaveChangesAsync();
+
+        await _studentRepository.AddAsync(student);
         return student;
     }
 
@@ -38,29 +37,22 @@ public class StudentService : IStudentService
         {
             throw new Exception("Full Name is required");
         }
-        
-        var student = await _context.Students.FindAsync(id);
+
+        var student = await _studentRepository.GetByIdAsync(id);
         if (student == null)
         {
             throw new Exception("Student not found");
         }
-        
+
         student.FullName = dto.FullName;
         student.Email = dto.Email;
-        await _context.SaveChangesAsync();
+
+        await _studentRepository.UpdateAsync(student);
         return student;
-        
     }
 
     public async Task DeleteStudentAsync(Guid id)
     {
-        var student = await _context.Students.FindAsync(id);
-        if (student == null)
-        {
-            throw new Exception("Student not found");
-        }
-        
-        _context.Students.Remove(student);
-        await _context.SaveChangesAsync();
+        await _studentRepository.DeleteAsync(id);
     }
 }

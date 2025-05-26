@@ -1,15 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StudentAssignmentAPI.Constrains.Response;
 using StudentAssignmentAPI.Data;
+using StudentAssignmentAPI.Entities;
+using StudentAssignmentAPI.GenericRepo;
 using StudentAssignmentAPI.Repositories.Interfaces;
 
 namespace StudentAssignmentAPI.Repositories;
 
-public class StudentRepository : IStudentRepository
+
+public class StudentRepository : GenericRepo<Student>, IStudentRepository
 {
     private readonly ApplicationDbContext _context;
 
-    public StudentRepository(ApplicationDbContext context)
+    public StudentRepository(ApplicationDbContext context) : base(context)
     {
         _context = context;
     }
@@ -24,6 +27,7 @@ public class StudentRepository : IStudentRepository
                 FullName = s.FullName
             })
             .ToListAsync();
+
         return students;
     }
 
@@ -38,12 +42,12 @@ public class StudentRepository : IStudentRepository
                 FullName = s.FullName
             })
             .FirstOrDefaultAsync();
-        
+
         if (student == null)
         {
             throw new Exception("Student not found");
         }
-        
+
         return student;
     }
 }

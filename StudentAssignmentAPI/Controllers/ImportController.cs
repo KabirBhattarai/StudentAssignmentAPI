@@ -8,11 +8,11 @@ namespace StudentAssignmentAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class BulkController : ControllerBase
+public class ImportController : ControllerBase
 {
     private readonly IBulkJobService _bulkJobService;
 
-    public BulkController(IBulkJobService bulkJobService)
+    public ImportController(IBulkJobService bulkJobService)
     {
         _bulkJobService = bulkJobService;
     }
@@ -32,6 +32,7 @@ public class BulkController : ControllerBase
         });
     }
 
+    [HttpGet("check/{jobId}")]
     public IActionResult Check(string jobId)
     {
         try
@@ -60,6 +61,10 @@ public class BulkController : ControllerBase
     public IActionResult ImportAssignments([FromBody] BulkAssignmentDto dto)
     {
         var jobId = BackgroundJob.Enqueue(() => _bulkJobService.ImportAssignmentsAsync(dto.Assignments));
-        return Ok(new { JobId = jobId, Status = "Queued" });
+        return Ok(new 
+        { 
+            JobId = jobId, 
+            Status = "Queued" 
+        });
     }
 }
